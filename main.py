@@ -47,8 +47,8 @@ def train(_class_, pars):
 
     data_transform, gt_transform = get_data_transforms(pars.image_size, pars.image_size)
     
-    train_path = '/content/' + _class_ + '/train'
-    test_path = '/content/' + _class_
+    train_path = '/kaggle/input/' + _class_ + '/train'
+    test_path = '/kaggle/input/' + _class_
     
     if not os.path.exists(pars.save_folder + '/' + _class_):
         os.makedirs(pars.save_folder + '/' + _class_)
@@ -118,6 +118,8 @@ def train(_class_, pars):
         num_epoch = 200
     if _class_ in ['bottle']:
         num_epoch = 200
+    if _class_ in ['dronodatrunway']:
+        num_epoch = 300
 
     print(f'with class {_class_}, Training with {num_epoch} Epoch')
     
