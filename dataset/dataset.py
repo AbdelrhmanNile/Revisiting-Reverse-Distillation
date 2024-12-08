@@ -58,18 +58,18 @@ class MVTecDataset_train(torch.utils.data.Dataset):
         img_path = self.img_paths[idx]
         img = cv2.imread(img_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img= cv2.resize(img/255., (256, 256))
+        img= cv2.resize(img/255., (1024, 1024))
         ## Normal
         img_normal = self.transform(img)
         ## simplex_noise
-        size = 256
+        size = 1024
         h_noise = np.random.randint(10, int(size//8))
         w_noise = np.random.randint(10, int(size//8))
         start_h_noise = np.random.randint(1, size - h_noise)
         start_w_noise = np.random.randint(1, size - w_noise)
         noise_size = (h_noise, w_noise)
         simplex_noise = self.simplexNoise.rand_3d_octaves((3, *noise_size), 6, 0.6)
-        init_zero = np.zeros((256,256,3))
+        init_zero = np.zeros((1024,1024,3))
         init_zero[start_h_noise: start_h_noise + h_noise, start_w_noise: start_w_noise+w_noise, :] = 0.2 * simplex_noise.transpose(1,2,0)
         img_noise = img + init_zero
         img_noise = self.transform(img_noise)
@@ -112,7 +112,7 @@ class MVTecDataset_test(torch.utils.data.Dataset):
                 tot_labels.extend([1] * len(img_paths))
                 tot_types.extend([defect_type] * len(img_paths))
 
-        #assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
+        assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
 
         return img_tot_paths, gt_tot_paths, tot_labels, tot_types
 
