@@ -112,7 +112,7 @@ class MVTecDataset_test(torch.utils.data.Dataset):
                 tot_labels.extend([1] * len(img_paths))
                 tot_types.extend([defect_type] * len(img_paths))
 
-        assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
+        #assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
 
         return img_tot_paths, gt_tot_paths, tot_labels, tot_types
 

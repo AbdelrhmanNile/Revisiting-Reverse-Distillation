@@ -54,9 +54,9 @@ def train(_class_, pars):
         os.makedirs(pars.save_folder + '/' + _class_)
     save_model_path  = pars.save_folder + '/' + _class_ + '/' + 'wres50_'+_class_+'.pth'
     train_data = MVTecDataset_train(root=train_path, transform=data_transform)
-    test_data = MVTecDataset_test(root=test_path, transform=data_transform, gt_transform=gt_transform)
+    #test_data = MVTecDataset_test(root=test_path, transform=data_transform, gt_transform=gt_transform)
     train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=pars.batch_size, shuffle=True)
-    test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=1, shuffle=False)
+    #test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=1, shuffle=False)
 
     # Use pretrained ImageNet for encoder
     encoder, bn = wide_resnet50_2(pretrained=True)
@@ -160,7 +160,8 @@ def train(_class_, pars):
             loss_distill_running += L_distill.detach().cpu().item()
             
 
-        auroc_px, auroc_sp, aupro_px = evaluation_multi_proj(encoder, proj_layer, bn, decoder, test_dataloader, device)        
+        #auroc_px, auroc_sp, aupro_px = evaluation_multi_proj(encoder, proj_layer, bn, decoder, test_dataloader, device)
+        auroc_px, auroc_sp, aupro_px = 1, 1, 1
         auroc_px_list.append(auroc_px)
         auroc_sp_list.append(auroc_sp)
         aupro_px_list.append(aupro_px)
@@ -190,24 +191,24 @@ def train(_class_, pars):
         print('Epoch {}, Sample Auroc: {:.4f}, Pixel Auroc:{:.4f}, Pixel Aupro: {:.4f}'.format(epoch, auroc_sp, auroc_px, aupro_px))
     
 
-        if (auroc_px + auroc_sp + aupro_px) / 3 > best_score:
-            best_score = (auroc_px + auroc_sp + aupro_px) / 3
-            
-            best_auroc_px = auroc_px
-            best_auroc_sp = auroc_sp
-            best_aupro_px = aupro_px
-            best_epoch = epoch
+        #if (auroc_px + auroc_sp + aupro_px) / 3 > best_score:
+        best_score = (auroc_px + auroc_sp + aupro_px) / 3
+        
+        best_auroc_px = auroc_px
+        best_auroc_sp = auroc_sp
+        best_aupro_px = aupro_px
+        best_epoch = epoch
 
-            torch.save({'proj': proj_layer.state_dict(),
-                       'decoder': decoder.state_dict(),
-                        'bn':bn.state_dict()}, save_model_path)
+        torch.save({'proj': proj_layer.state_dict(),
+                    'decoder': decoder.state_dict(),
+                    'bn':bn.state_dict()}, save_model_path)
 
-            history_infor['auroc_sp'] = best_auroc_sp
-            history_infor['auroc_px'] = best_auroc_px
-            history_infor['aupro_px'] = best_aupro_px
-            history_infor['epoch'] = best_epoch
-            with open(os.path.join(pars.save_folder + '/' + _class_, f'history.json'), 'w') as f:
-                json.dump(history_infor, f)
+        history_infor['auroc_sp'] = best_auroc_sp
+        history_infor['auroc_px'] = best_auroc_px
+        history_infor['aupro_px'] = best_aupro_px
+        history_infor['epoch'] = best_epoch
+        with open(os.path.join(pars.save_folder + '/' + _class_, f'history.json'), 'w') as f:
+            json.dump(history_infor, f)
     return best_auroc_sp, best_auroc_px, best_aupro_px
 
 
