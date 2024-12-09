@@ -120,7 +120,7 @@ class MVTecDataset_test(torch.utils.data.Dataset):
         return len(self.img_paths)
 
     def __getitem__(self, idx):
-        img_path, gt, label, img_type = self.img_paths[idx], self.gt_paths[idx], self.labels[idx], self.types[idx]
+        img_path, gt, label, img_type = self.img_paths[idx], 0, self.labels[idx], self.types[idx]
         img = cv2.imread(img_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img= cv2.resize(img/255., (1024, 1024))
