@@ -75,7 +75,25 @@ def evaluation_multi_proj(encoder,proj,bn, decoder, dataloader,device, output_pa
             cam = cv2.resize(cam, (1024, 1024))
 
             # save cam
-            cv2.imwrite(f"{output_path}/cam_{img_path}", cam)
+            #cv2.imwrite(f"{output_path}/cam_{img_path[0]}", cam)
+
+            # grid of 3 images
+            plt.figure(figsize=(15, 5))
+            plt.subplot(1, 3, 1)
+            plt.imshow(img[0].permute(1, 2, 0).cpu().numpy())
+            plt.title("Input Image")
+            plt.axis("off")
+
+            plt.subplot(1, 3, 2)
+            plt.imshow(anomaly_map, cmap="jet")
+            plt.title("Anomaly Map")
+            plt.axis("off")
+
+            plt.subplot(1, 3, 3)
+            plt.imshow(cam)
+
+            # save grid
+            plt.savefig(f"{output_path}/{img_path[0]}")
 
     return 1, 1, 1
 
