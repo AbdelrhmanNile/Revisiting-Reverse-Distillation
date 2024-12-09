@@ -71,7 +71,7 @@ def evaluation_multi_proj(encoder,proj,bn, decoder, dataloader,device, output_pa
             outputs = decoder(bn(features))
             anomaly_map, _ = cal_anomaly_map(inputs, outputs, img.shape[-1], amap_mode='a')
             anomaly_map = gaussian_filter(anomaly_map, sigma=4)
-            cam = show_cam_on_image(img[0].permute(1, 2, 0).cpu().numpy(), anomaly_map)
+            cam = show_cam_on_image(img[0].permute(1, 2, 0).cpu().numpy(), cvt2heatmap(anomaly_map))
             cam = cv2.resize(cam, (1024, 1024))
 
             # save cam
