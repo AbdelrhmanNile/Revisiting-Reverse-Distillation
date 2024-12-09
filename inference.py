@@ -24,6 +24,7 @@ def get_args():
     parser.add_argument('--checkpoint_folder', default = './your_checkpoint_folder', type=str)
     parser.add_argument('--image_size', default = 256, type=int)
     parser.add_argument('--classes', nargs="+", default=["carpet", "leather"])
+    parser.add_argument('--outputs_path', default = './outputs', type=str)
     pars = parser.parse_args()
     return pars
 
@@ -55,7 +56,7 @@ def inference(_class_, pars):
     bn.load_state_dict(ckp['bn'])
     decoder.load_state_dict(ckp['decoder'])
   
-    auroc_px, auroc_sp, aupro_px = evaluation_multi_proj(encoder, proj_layer, bn, decoder, test_dataloader, device)        
+    auroc_px, auroc_sp, aupro_px = evaluation_multi_proj(encoder, proj_layer, bn, decoder, test_dataloader, device, pars.outputs_path)  
     print('{}: Sample Auroc: {:.4f}, Pixel Auroc:{:.4f}, Pixel Aupro: {:.4f}'.format(_class_, auroc_sp, auroc_px, aupro_px))
     return auroc_sp, auroc_px, aupro_px
 

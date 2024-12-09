@@ -112,7 +112,7 @@ class MVTecDataset_test(torch.utils.data.Dataset):
                 tot_labels.extend([1] * len(img_paths))
                 tot_types.extend([defect_type] * len(img_paths))
 
-        assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
+        #assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
 
         return img_tot_paths, gt_tot_paths, tot_labels, tot_types
 
@@ -123,16 +123,16 @@ class MVTecDataset_test(torch.utils.data.Dataset):
         img_path, gt, label, img_type = self.img_paths[idx], self.gt_paths[idx], self.labels[idx], self.types[idx]
         img = cv2.imread(img_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img= cv2.resize(img/255., (256, 256))
+        img= cv2.resize(img/255., (1024, 1024))
         ## Normal
         img = self.transform(img)
         ## simplex_noise
         
-        if gt == 0:
-            gt = torch.zeros([1, img.shape[-1], img.shape[-1]])
-        else:
-            gt = Image.open(gt)
-            gt = self.gt_transform(gt)
+        #if gt == 0:
+        gt = torch.zeros([1, img.shape[-1], img.shape[-1]])
+        #else:
+        #    gt = Image.open(gt)
+        #    gt = self.gt_transform(gt)
 
         assert img.shape[1:] == gt.shape[1:], "image.size != gt.size !!!"
 

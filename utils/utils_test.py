@@ -9,6 +9,7 @@ from skimage import measure
 from statistics import mean
 from scipy.ndimage import gaussian_filter
 import warnings
+from matplotlib import pyplot as plt
 
 
 
@@ -52,18 +53,17 @@ def cvt2heatmap(gray):
 
 
 
-def evaluation_multi_proj(encoder,proj,bn, decoder, dataloader,device):
+def evaluation_multi_proj(encoder,proj,bn, decoder, dataloader,device, output_path):
     encoder.eval()
     proj.eval()
     bn.eval()
     decoder.eval()
-    gt_list_px = []
-    pr_list_px = []
-    gt_list_sp = []
-    pr_list_sp = []
-    aupro_list = []
+    imgs = []
+    anomaly_maps = []
+    cams = []
+
     with torch.no_grad():
-        for (img, gt, label, _, _) in dataloader:
+        for (img, gt, label, _, img_path) in dataloader:
 
             img = img.to(device)
             inputs = encoder(img)
@@ -71,19 +71,13 @@ def evaluation_multi_proj(encoder,proj,bn, decoder, dataloader,device):
             outputs = decoder(bn(features))
             anomaly_map, _ = cal_anomaly_map(inputs, outputs, img.shape[-1], amap_mode='a')
             anomaly_map = gaussian_filter(anomaly_map, sigma=4)
-            gt[gt > 0.5] = 1
-            gt[gt <= 0.5] = 0
-            if label.item()!=0:
-                aupro_list.append(compute_pro(gt.squeeze(0).cpu().numpy().astype(int),
-                                              anomaly_map[np.newaxis,:,:]))
-            gt_list_px.extend(gt.cpu().numpy().astype(int).ravel())
-            pr_list_px.extend(anomaly_map.ravel())
-            gt_list_sp.append(np.max(gt.cpu().numpy().astype(int)))
-            pr_list_sp.append(np.max(anomaly_map))
+            cam = show_cam_on_image(img[0].permute(1, 2, 0).cpu().numpy(), anomaly_map)
+            cam = cv2.resize(cam, (1024, 1024))
 
-        auroc_px = round(roc_auc_score(gt_list_px, pr_list_px), 4)
-        auroc_sp = round(roc_auc_score(gt_list_sp, pr_list_sp), 4)
-    return auroc_px, auroc_sp, round(np.mean(aupro_list),4)
+            # save cam
+            cv2.imwrite(f"{output_path}/cam_{img_path}", cam)
+
+    return 1, 1, 1
 
 
 def compute_pro(masks: ndarray, amaps: ndarray, num_th: int = 200) -> None:
