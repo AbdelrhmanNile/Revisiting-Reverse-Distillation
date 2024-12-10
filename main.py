@@ -37,6 +37,7 @@ def get_args():
     parser.add_argument('--distill_lr', default = 0.005, type=float)
     parser.add_argument('--weight_proj', default = 0.2, type=float) 
     parser.add_argument('--classes', nargs="+", default=["carpet", "leather"])
+    parser.add_argument("--resume", default="", type=str)
     pars = parser.parse_args()
     return pars
 
@@ -123,6 +124,12 @@ def train(_class_, pars):
 
     print(f'with class {_class_}, Training with {num_epoch} Epoch')
     
+    if pars.resume != '':
+        checkpoint = torch.load(pars.resume)
+        proj_layer.load_state_dict(checkpoint['proj'])
+        decoder.load_state_dict(checkpoint['decoder'])
+        bn.load_state_dict(checkpoint['bn'])
+        print('Resume training from: ', pars.resume)
     for epoch in tqdm(range(1,num_epoch+1)):
         bn.train()
         proj_layer.train()
